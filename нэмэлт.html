@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game with Spaceship</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url(""); /* Зурагт URL-с солих */
+            background-size: cover;  /* Зургийг дэлгэцийн хэмжээтэй тохируулна */
+            background-position: center;  /* Зургийн байршлыг төвд байрлуулах */
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+            border: 2px solid #4d425f;
+            box-shadow: 0 0 70px rgba(255, 255, 255, 0.6);
+        }
+
+        .score {
+            font-size: 20px;
+            color: #fff;
+            margin: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="score">Score: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <button id="restartButton" style="display: none;">Restart</button>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let words = ['ᠠ', 'ᠰ', 'ᠳ', 'ᠹ', 'ᠭ', 'ᠬ', 'ᠵ', 'ᠺ', 'ᠯ', 'ᠽ', 'ᠱ', 'ᠴ', 'ᠤ', 'ᠪ', 'ᠨ', 'ᠮ'];
+        let activeWords = [];
+        let bullets = [];
+        let score = 0;
+        let level = 1;
+        let gameOver = false;
+        let currentTarget = null;
+        let gameStarted = false;
+        let wordSpawnInterval = 2000;
+        let wordSpawnTimer;
+
+        const spaceship = {
+            x: canvas.width / 2,
+            y: canvas.height - 60,
+            width: 40,
+            height: 60,
+            color: "Turquoise",
+        };
+
+        class Word {
+            constructor(text, x, y) {
+                this.text = text;
+                this.x = x;
+                this.y = y;
+                this.speed = 0.2+(level*0.1);
+                this.letters = this.text.split('').map((letter, index) => ({
+                    char: letter,
+                    x: this.x + index * 15,
+                    y: this.y,
+                    hit: false // buudsan useg
+                }));
+                this.isComplete = false;
+            }
+
+            draw() {
+                ctx.font = '60px Arial';
+                ctx.fillStyle = 'white';
+                this.letters.forEach(letter => {
+                    ctx.fillText(letter.char, letter.x, letter.y);
+                });
+            }
+
+            update() {
+                if (!this.isComplete) {
+                    this.y += this.speed;
+                    this.letters.forEach(letter => {
+                        letter.y = this.y;
+                    });
+                }
+            }
+
+            removeLetter() {
+                if (this.letters.length > 0) {
+                    this.letters.shift();
+                    this.text = this.letters.map(letter => letter.char).join('');
+                }
+                if (this.letters.length === 0) {
+                    this.isComplete = true;
+                    this.onComplete();  // Үг устсаны дараа дугарах
+                }
+            }
+            onComplete() {
+        // Үг дууссан үед дугарах
+        console.log(`Үг бүрэн устлаа: ${this.text}`);
+        const explosionSound = new Audio('c:/Users/hw/Downloads/explosion-91872.mp3'); // Таны дэлбэрэх дууны файлын зам
+        explosionSound.play();
+    }
+        }
+
+        class Bullet {
+            constructor(x, y, targetWord, letterIndex) {
+                this.x = x;
+                this.y = y;
+                this.targetWord = targetWord;
+                this.letterIndex = letterIndex;
+                this.speed = 10;
+                this.targetLetter = targetWord.letters[this.letterIndex];
+                this.sent = false; // Бид энэ өөрчлөлтөөр үсэгт нэг сум илгээхийг хянах болно.
+                this.sound = new Audio('c:/Users/hw/Downloads/22-caliber-with-ricochet-39679.mp3')
+            }
+
+            draw() {
+                ctx.fillStyle = 'red';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                if (!this.targetLetter) return;
+
+                const dx = this.targetLetter.x - this.x;
+                const dy = this.targetLetter.y - this.y;
+                const angle = Math.atan2(dy, dx);
+
+                this.x += this.speed * Math.cos(angle);
+                this.y += this.speed * Math.sin(angle);
+            }
+
+            isColliding() {
+        if (!this.targetLetter) return false;
+
+        const dx = this.targetLetter.x - this.x;
+        const dy = this.targetLetter.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 10) {
+            console.log(`Сум ${this.targetLetter.char} үсгийг буудлаа!`);  // Сум буудах үед дугарах
+            return true;
+        }
+        return false;
+    }
+}
+
+        function drawSpaceship() {
+            ctx.fillStyle = spaceship.color;
+            ctx.beginPath();
+            ctx.moveTo(spaceship.x, spaceship.y);
+            ctx.lineTo(spaceship.x - spaceship.width / 2, spaceship.y + spaceship.height);
+            ctx.lineTo(spaceship.x + spaceship.width / 2, spaceship.y + spaceship.height);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function spawnWord() {
+    const remainingWords = words.filter(word => !spawnedWords.includes(word));
+
+    if (remainingWords.length === 0) {
+        spawnedWords = [];
+    }
+
+    // Өмнө гарсан үгсийн эхний үсэг давхардахгүй үг сонгох
+    let uniqueWords = remainingWords.filter(word => 
+        !spawnedWords.some(sw => sw[0] === word[0])
+    );
+
+    let text;
+    if (uniqueWords.length > 0) {
+        text = uniqueWords[Math.floor(Math.random() * uniqueWords.length)];
+    } else {
+        text = remainingWords[Math.floor(Math.random() * remainingWords.length)];
+    }
+
+    spawnedWords.push(text);
+    const x = Math.random() * (canvas.width - 100) + 50;
+    const y = 0;
+    activeWords.push(new Word(text, x, y));
+}
+
+
+        function adjustWordSpawnSpeed() {
+            clearInterval(wordSpawnTimer);
+            wordSpawnInterval = Math.max(300, 2000 - (level * 100));
+            wordSpawnTimer = setInterval(spawnWord, wordSpawnInterval);
+        }
+
+        function drawScore() {
+            ctx.font = '30px Arial';
+            ctx.fillStyle = 'yellow';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+            ctx.fillText(`Level: ${level}`, 10, 60);
+        }
+
+        function getClosestWord() {
+            let closest = null;
+            let minDistance = Infinity;
+
+            activeWords.forEach((word) => {
+                const dx = spaceship.x - word.x;
+                const dy = spaceship.y - word.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closest = word;
+                }
+            });
+
+            return closest;
+        }
+
+        function checkLevelUp() {
+            if (score >= level * 100) {
+                level++;
+                adjustWordSpawnSpeed();
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+            ctx.font = '50px Arial';
+            ctx.fillStyle = 'red';
+            ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText('Press 1 to Restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
+        }
+
+        function resetGame() {
+            activeWords = [];
+            bullets = [];
+            score == 0;
+            level = 1;
+            gameOver = false;
+            currentTarget = null;
+            gameStarted = false;
+            spawnedWords = [];
+
+            if (!gameStarted) {
+                gameStarted = true;
+                adjustWordSpawnSpeed();
+            }
+            gameLoop();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            activeWords.forEach((word, index) => {
+                word.update();
+                word.draw();
+                if (word.y > canvas.height) {
+                    endGame();
+                    return;
+                }
+            });
+
+            bullets.forEach((bullet, index) => {
+                bullet.update();
+                bullet.draw();
+                if (bullet.isColliding()) {
+                    bullet.targetWord.removeLetter();
+                    if (bullet.targetWord.isComplete) {
+                        currentTarget = null;
+                        const wordIndex = activeWords.indexOf(bullet.targetWord);
+                        if (wordIndex > -1) {
+                            activeWords.splice(wordIndex, 1);
+                            score+=10;
+                        }
+                    }
+                    bullets.splice(index, 1);
+                }
+            });
+
+            if (!currentTarget || currentTarget.isComplete) {
+                currentTarget = getClosestWord();
+            }
+
+            drawSpaceship();
+            drawScore();
+            checkLevelUp();
+
+            if (gameOver) return;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (e) => {
+    const input = e.key.toLowerCase(); // Том жижиг үсэг ялгахгүй
+
+    if (input === '1') {
+        resetGame();
+    }
+
+    if (gameOver) return;
+
+    if (!currentTarget || currentTarget.isComplete) {
+        currentTarget = getClosestWord();
+    }
+
+    if (currentTarget) {
+        let firstLetterIndex = currentTarget.letters.findIndex(l => !l.hit); // Буудуулж амжаагүй эхний үсэг
+
+        if (firstLetterIndex !== -1 && currentTarget.letters[firstLetterIndex].char === input) {
+            let bullet = new Bullet(spaceship.x, spaceship.y, currentTarget, firstLetterIndex);
+            bullets.push(bullet);
+            currentTarget.letters[firstLetterIndex].hit = true; // Буудуулсан тэмдэглэгээ
+            bullet.sound.play();
+        }
+    }
+});
+
+// Сум байндаа хүрсэн эсэхийг шалгах:
+bullets.forEach((bullet, index) => {
+    bullet.update();
+    bullet.draw();
+
+    if (bullet.isColliding()) {
+        let targetWord = bullet.targetWord;
+        let letterIndex = bullet.letterIndex;
+
+        if (targetWord.letters[letterIndex]) { 
+            targetWord.letters.splice(letterIndex, 1); // Зөвхөн буудсан үсгийг устгана
+        }
+
+        if (targetWord.letters.length === 0) {
+            currentTarget = null;
+            let wordIndex = activeWords.indexOf(targetWord);
+            if (wordIndex > -1) {
+                activeWords.splice(wordIndex, 1);
+                score++;
+            }
+        }
+
+        bullets.splice(index, 1);
+    }
+});
+
+
+        
+        adjustWordSpawnSpeed();
+        gameLoop();
+    </script>
+</body>
+</html>

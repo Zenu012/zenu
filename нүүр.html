@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тоглоом - Нүүр хуудас</title>
+    <style>
+        /* Нийт CSS тохиргоо */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000000, #4CAF50,  #05ebfc);
+            background-size: 400% 400%;
+            animation: gradientBG 3s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.8); /* Хар өнгө нэмсэн */
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #00ff66; /* Илүү гэрэлтсэн ногоон */
+            text-shadow: 0px 5px 10px rgba(0, 255, 100, 0.9);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            background: #004d40;
+            color: #00ff66; /* Илүү гэрэлтсэн ногоон */
+            outline: none;
+            box-shadow: 0 4px 10px rgba(0, 255, 100, 0.3);
+        }
+
+        select:hover {
+            background: #006d50;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #00b894, #004d40);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 255, 100, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тоглоом</h1>
+        <p>Энэхүү тоглоомоор таны бичих чадварыг сайжруулж, хурдтай бөгөөд зөв бичих чадварт суралцаарай!</p>
+
+        <!-- Хэл сонгох хэсэг -->
+        <div class="form-group">
+            <label for="language">Хэл сонгоно уу:</label>
+            <select id="language" onchange="updateLinks()">
+                <option value="mn">Монгол хэл</option>
+                <option value="mb">Монгол бичиг</option>
+                <option value="en">Англи хэл</option>
+            </select>
+        </div>
+
+        <!-- Түвшин сонгох хэсэг -->
+        <div class="form-group">
+            <label for="difficulty">Түвшин сонгоно уу:</label>
+            <select id="difficulty" onchange="updateLinks()">
+                <option value="easy">Энгийн</option>
+                <option value="medium">Дунд</option>
+                <option value="hard">Хүнд</option>
+            </select>
+        </div>
+
+        <!-- Тоглоом эхлүүлэх товч -->
+        <a id="start-link" href="C:/Users/hw/OneDrive/Desktop/type/ангил хэл.html?difficulty=easy">
+            <button>Эхлэх</button>
+        </a>
+    </div>
+
+    <script>
+        function updateLinks() {
+            const language = document.getElementById('language').value;
+            const difficulty = document.getElementById('difficulty').value;
+
+            let baseUrl = "";
+
+            if (language === "mn") {
+                baseUrl = ":/Users/hw/OneDrive/Desktop/type/ангил хэл.html";
+            } else if (language === "mb") {
+                baseUrl = "C:/Users/hw/OneDrive/Desktop/type/нэмэлт.html";
+            } else if (language === "mn") {
+                baseUrl = "game.html";
+            }
+
+            const fullUrl = `${baseUrl}?difficulty=${difficulty}`;
+            document.getElementById('start-link').href = fullUrl;
+        }
+    </script>
+</body>
+</html>

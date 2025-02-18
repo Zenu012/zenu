@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гэгээлэг Сансарын UI Загвар</title>
+    <style>
+        /* Бүх элементүүдийн үндсэн тохиргоо */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Үндсэн биеийн тохиргоо */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #4d425f; /* Бүхэлдээ харанхуй, тод өнгө нэмэгдэнэ */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Сансрын фон болон анимаци */
+        .space-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1461811969394-400d0be24144') no-repeat center center fixed;
+            background-size: cover;
+            animation: spaceMove 120s linear infinite;
+        }
+
+        @keyframes spaceMove {
+            0% { background-position: 0 0; }
+            100% { background-position: -10000px -10000px; }
+        }
+
+        /*  */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: #342a45;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 0 70px rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        /* Гарчиг хэсэг */
+        .header h1 {
+            font-size: 3.5rem;
+            color: #ffb3ff;
+            text-shadow: 0 0 20px rgba(255, 179, 255, 1), 0 0 40px rgba(255, 255, 255, 1);
+            letter-spacing: 2px;
+        }
+
+        /* Гол хэсгийн тохиргоо */
+        .main-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .main-display .circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: url('c:Users/hw/OneDrive/Hình ảnh/f4e65e7f887093d2b427219f6b6342bf.jpg') no-repeat center center;
+            background-size: cover;
+            animation: orbit 25s infinite linear;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Гариг эргэх анимаци */
+        @keyframes orbit {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Үзүүлэлтний хэсэг */
+        .main-display .description {
+            max-width: 500px;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin-left: 50px;
+            color: #ffffff;
+        }
+
+        /* Сонголтын хэсэг */
+        .grid {
+            display: flex;
+        justify-content: center;
+        align-items: center;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .grid-item {
+            background: #241b35;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 400px;
+        }
+
+        .grid-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.7);
+        }
+
+        .grid-item h3 {
+            color: #ffb3ff;
+            margin-bottom: 10px;
+        }
+
+        .grid-item p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #aaffff;
+        }
+
+        /* Хөл хэсэг */
+        .footer {
+            margin-top: 50px;
+        }
+
+        .footer button {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            background: linear-gradient(45deg, #ff00cc, #66ff66);
+            border: none;
+            color: #fff;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .footer button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            border: none;
+            background: #100c18;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .form-group select:hover {
+            background: #4d425f;
+            
+        }
+
+   
+        
+    </style>
+</head>
+<body>
+    <div class="space-background"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Тоглоом</h1>
+        </div>
+
+        <div class="main-display">
+            <div class="circle"></div>
+            <div class="description">
+                <p>Энэхүү тоглоомоор таны бичих чадварыг сайжруулж, хурдтай бөгөөд зөв бичих чадварт суралцаарай!</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="grid-item">
+                <h3>Хэлний сонголт</h3>
+                <div class="form-group">
+                    <label for="language">Хэлээ сонгоно уу:</label>
+                    <select id="language" onchange="updateLinks()">
+                        <option value="mn">Монгол</option>
+                        <option value="mb">Монгол бичиг</option>
+                        <option value="en">Англи</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-item">
+                <h3>Түвшний сонголт</h3>
+                <div class="form-group">
+                    <label for="difficulty">Түвшнээ сонгоно уу:</label>
+                    <select id="difficulty">
+                        <option value="easy">Хялбар</option>
+                        <option value="medium">Дунд</option>
+                        <option value="hard">Хүнд</option>
+                    </select>
+                </div>
+            </div>
+
+            
+            
+        </div>
+
+        <div class="footer">
+            <a id="start-link" href="C:/Users/hw/OneDrive/Desktop/type/Монгол хэл.html?difficulty=easy">
+                <button>Эхлэх</button>
+            </a>
+        
+            <script>
+                function updateLinks() {
+                    const language = document.getElementById('language').value;
+                    const difficulty = document.getElementById('difficulty').value;
+        
+                    let baseUrl = "";
+        
+                    if (language === "mn") { // Монгол хэл
+                        if (difficulty === "easy") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Монгол хэл хялбар.html";
+                        } else if (difficulty === "medium") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Монгол хэл дунд.html";
+                        } else if (difficulty === "hard") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Монгол хэл хүнд.html";
+                        }
+                    } else if (language === "mb") { // Монгол бичиг
+                        if (difficulty === "easy") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/нэмэлт.html";
+                        } else if (difficulty === "medium") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Монгол бичиг дунд.html";
+                        } else if (difficulty === "hard") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Монгол бичиг хүнд.html";
+                        }
+                    } else if (language === "en") { // Англи хэл
+                        if (difficulty === "easy") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Англи хэл хялбар.html";
+                        } else if (difficulty === "medium") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Англи хэл дунд.html";
+                        } else if (difficulty === "hard") {
+                            baseUrl = "C:/Users/hw/OneDrive/Desktop/type/Англи хэл хүнд.html";
+                        }
+                        
+                    }
+        
+                    // Үүсэх холбоос
+                    const fullUrl = `${baseUrl}?difficulty=${difficulty}`;
+                    document.getElementById('start-link').href = fullUrl;
+                }
+        
+                // Сонголт өөрчлөгдөх үед updateLinks() функцийг дуудах
+                document.getElementById('language').addEventListener('change', updateLinks);
+                document.getElementById('difficulty').addEventListener('change', updateLinks);
+            </script>
+</body>
+</html>
